@@ -414,6 +414,9 @@ internal static class NativeMethods_AVFoundation
         [DllImport(Path)]
         public static extern unsafe IntPtr CFDictionaryCreate(IntPtr allocator, void* keys, void* values, nint numValues, IntPtr keyCallBacks, IntPtr valueCallBacks);
 
+        [DllImport(Path)]
+        public static extern void CFShow(IntPtr obj);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct CFRange
         {
@@ -1089,6 +1092,10 @@ internal static class NativeMethods_AVFoundation
                     numValues: 1,
                     LibCoreFoundation.kCFCopyStringDictionaryKeyCallBacks,
                     LibCoreFoundation.kCFTypeDictionaryValueCallBacks);
+
+                LibCoreFoundation.CFShow(dictionary);
+                LibCoreFoundation.CFShow(number);
+                LibCoreFoundation.CFShow(LibCoreVideo.kCVPixelBufferPixelFormatTypeKey);
 
                 LibObjC.SendNoResult(
                     Handle,
