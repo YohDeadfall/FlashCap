@@ -374,7 +374,7 @@ internal static class NativeMethods_AVFoundation
 
         public static readonly IntPtr Handle = Dlfcn.OpenLibrary(Path, Dlfcn.Mode.None);
         public static readonly IntPtr kCFTypeArrayCallbacks = Dlfcn.GetSymbol(Handle, "kCFTypeArrayCallBacks");
-        public static readonly IntPtr kCFCopyStringDictionaryKeyCallBacks = Dlfcn.GetSymbolIndirect(Handle, "kCFCopyStringDictionaryKeyCallBacks");
+        public static readonly IntPtr kCFCopyStringDictionaryKeyCallBacks = Dlfcn.GetSymbolIndirect(Handle, "kCFTypeDictionaryKeyCallBacks");
         public static readonly IntPtr kCFTypeDictionaryValueCallBacks = Dlfcn.GetSymbolIndirect(Handle, "kCFTypeDictionaryValueCallBacks");
 
         [DllImport(Path)]
@@ -412,7 +412,7 @@ internal static class NativeMethods_AVFoundation
         public static extern unsafe bool CFNumberGetValue(IntPtr number, CFNumberType theType, void* valuePtr);
 
         [DllImport(Path)]
-        public static extern unsafe IntPtr CFDictionaryCreate(IntPtr allocator, void* keys, void* values, nint numValues, IntPtr keyCallBacks, IntPtr valueCallBacks);
+        public static extern unsafe IntPtr CFDictionaryCreate(IntPtr allocator, IntPtr[] keys, IntPtr[] values, nint numValues, IntPtr keyCallBacks, IntPtr valueCallBacks);
 
         [DllImport(Path)]
         public static extern void CFShow(IntPtr obj);
@@ -1082,13 +1082,13 @@ internal static class NativeMethods_AVFoundation
             public unsafe void SetPixelFormatType(int format)
             {
                 var number = LibCoreFoundation.CFNumberCreate(IntPtr.Zero, LibCoreFoundation.CFNumberType.sInt32Type, &format);
-                var keys = stackalloc IntPtr[] { LibCoreVideo.kCVPixelBufferPixelFormatTypeKey };
-                var values = stackalloc IntPtr[] { number };
+                var keys = new IntPtr[] { LibCoreVideo.kCVPixelBufferPixelFormatTypeKey };
+                var values = new IntPtr[] { number };
 
                 var dictionary = LibCoreFoundation.CFDictionaryCreate(
                     IntPtr.Zero,
-                    &keys,
-                    &values,
+                    keys,
+                    values,
                     numValues: 1,
                     LibCoreFoundation.kCFCopyStringDictionaryKeyCallBacks,
                     LibCoreFoundation.kCFTypeDictionaryValueCallBacks);
