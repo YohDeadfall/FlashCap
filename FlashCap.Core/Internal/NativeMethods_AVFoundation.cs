@@ -1093,42 +1093,6 @@ internal static class NativeMethods_AVFoundation
                     LibCoreFoundation.kCFCopyStringDictionaryKeyCallBacks,
                     LibCoreFoundation.kCFTypeDictionaryValueCallBacks);
 
-                LibCoreFoundation.CFShow(dictionary);
-                LibCoreFoundation.CFShow(number);
-                LibCoreFoundation.CFShow(LibCoreVideo.kCVPixelBufferPixelFormatTypeKey);
-                Console.WriteLine("#0");
-
-                var dictionaryAllKeys = LibObjC.SendAndGetHandle(
-                    dictionary,
-                    LibObjC.GetSelector("allKeys"));
-
-                LibCoreFoundation.CFShow(dictionaryAllKeys);
-                Console.WriteLine("#1");
- 
-                foreach (var key in LibCoreFoundation.CFArray.ToArray(dictionaryAllKeys, h => h))
-                    LibCoreFoundation.CFShow(key);
-
-                Console.WriteLine("#2");
-
-                var settings = LibObjC.SendAndGetHandle(
-                    Handle,
-                    LibObjC.GetSelector("videoSettings"));
-                    
-                LibCoreFoundation.CFShow(settings);
-                Console.WriteLine("#3");
-
-                var settingsAllKeys = LibObjC.SendAndGetHandle(
-                    settings,
-                    LibObjC.GetSelector("allKeys"));
-
-                LibCoreFoundation.CFShow(settingsAllKeys);
-                Console.WriteLine("#4");
-
-                foreach (var key in LibCoreFoundation.CFArray.ToArray(settingsAllKeys, h => h))
-                    LibCoreFoundation.CFShow(key);
-
-                Console.WriteLine("#5");
-
                 LibObjC.SendNoResult(
                     Handle,
                     LibObjC.GetSelector("setVideoSettings:"),
