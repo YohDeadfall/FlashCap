@@ -159,7 +159,7 @@ public sealed class AVFoundationDevice : CaptureDevice
             var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
             var seconds = CMTimeGetSeconds(timeStamp);
 
-            CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.ReadOnly);
+            CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
 
             try
             {
@@ -177,7 +177,7 @@ public sealed class AVFoundationDevice : CaptureDevice
             }
             finally
             {
-                CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.ReadOnly);
+                CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
             }
         }
     }
