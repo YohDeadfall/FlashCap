@@ -653,6 +653,9 @@ internal static class NativeMethods_AVFoundation
         [DllImport(Path)]
         public static extern int CVPixelBufferUnlockBaseAddress(IntPtr pixelBuffer, PixelBufferLockFlags lockFlags);
 
+        [DllImport(Path)]
+        public static extern int CVPixelBufferGetPixelFormatType(IntPtr pixelBuffer);
+
         public enum PixelBufferLockFlags : long
         {
             None,

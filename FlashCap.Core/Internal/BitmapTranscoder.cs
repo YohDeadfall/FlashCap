@@ -124,6 +124,7 @@ internal static class BitmapTranscoder
         NativeMethods.Compression compression, bool performFullRange,
         byte* pFrom, byte* pTo)
     {
+        Console.WriteLine($"{width}, {height}, {compression}, {performFullRange}, {new IntPtr(pFrom)}, {new IntPtr(pTo)}");
         switch (compression)
         {
             case NativeMethods.Compression.UYVY:

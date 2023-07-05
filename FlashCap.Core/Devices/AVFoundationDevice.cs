@@ -163,6 +163,8 @@ public sealed class AVFoundationDevice : CaptureDevice
 
             try
             {
+                Console.WriteLine($"{CVPixelBufferGetBaseAddress(pixelBuffer)}");
+                Console.WriteLine(GetFourCCName(CVPixelBufferGetPixelFormatType(pixelBuffer)));
                 this.device.frameProcessor?.OnFrameArrived(
                     this.device,
                     CVPixelBufferGetBaseAddress(pixelBuffer),
