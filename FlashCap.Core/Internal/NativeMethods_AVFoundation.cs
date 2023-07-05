@@ -1096,6 +1096,8 @@ internal static class NativeMethods_AVFoundation
                     LibCoreFoundation.kCFCopyStringDictionaryKeyCallBacks,
                     LibCoreFoundation.kCFTypeDictionaryValueCallBacks);
 
+                Console.WriteLine($"Format Requested: {LibCoreVideo.GetFourCCName(format)}");
+
                 LibObjC.SendNoResult(
                     Handle,
                     LibObjC.GetSelector("setVideoSettings:"),
