@@ -151,10 +151,15 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override void DidDropSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
+            Console.WriteLine($"{nameof(DidDropSampleBuffer)}:{captureOutput}:{sampleBuffer}:{connection}");
+            Console.WriteLine($"PixelBuffer: {CMSampleBufferGetImageBuffer(sampleBuffer)}");
         }
 
         public override void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
+            Console.WriteLine($"{nameof(DidOutputSampleBuffer)}:{captureOutput}:{sampleBuffer}:{connection}");
+            Console.WriteLine($"PixelBuffer: {CMSampleBufferGetImageBuffer(sampleBuffer)}");
+
             var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
             var seconds = CMTimeGetSeconds(timeStamp);
