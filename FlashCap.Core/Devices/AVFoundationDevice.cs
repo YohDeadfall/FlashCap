@@ -164,6 +164,11 @@ public sealed class AVFoundationDevice : CaptureDevice
             var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
             var seconds = CMTimeGetSeconds(timeStamp);
 
+            if (pixelBuffer == IntPtr.Zero)
+            {
+                return;
+            }
+
             CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
 
             try
