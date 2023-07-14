@@ -156,8 +156,6 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override void DidDropSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
-            Console.WriteLine($"{nameof(DidDropSampleBuffer)}:{captureOutput}:{sampleBuffer}:{connection}");
-            Console.WriteLine($"PixelBuffer: {CMSampleBufferGetImageBuffer(sampleBuffer)}");
         }
 
         public override void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
@@ -171,6 +169,25 @@ public sealed class AVFoundationDevice : CaptureDevice
 
             if (pixelBuffer == IntPtr.Zero)
             {
+                var blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
+                if (blockBuffer != IntPtr.Zero)
+                {
+                    IntPtr lengthAtOffset;
+                    IntPtr totalLength;
+                    IntPtr dataPointer;
+                    CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, out lengthAtOffset, out totalLength, out dataPointer);
+
+                    if (lengthAtOffset == totalLength)
+                    {
+                        this.device.frameProcessor?.OnFrameArrived(
+                            this.device,
+                            dataPointer,
+                            (int)totalLength,
+                            (long)(seconds * 1000),
+                            this.frameIndex++);
+                    }
+                }
+
                 return;
             }
 

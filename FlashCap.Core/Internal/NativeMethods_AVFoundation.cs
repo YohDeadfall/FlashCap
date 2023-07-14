@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -12,10 +11,10 @@ internal static class NativeMethods_AVFoundation
 {
     public static readonly Dictionary<PixelFormats, int> PixelFormatMap = new()
     {
-        //[PixelFormats.RGB16] = LibCoreVideo.PixelFormatType_24RGB,
+        [PixelFormats.RGB16] = LibCoreVideo.PixelFormatType_24RGB,
         [PixelFormats.RGB32] = LibCoreVideo.PixelFormatType_30RGB,
         [PixelFormats.ARGB32] = LibCoreVideo.PixelFormatType_32ARGB,
-        //[PixelFormats.YUYV] = LibCoreVideo.PixelFormatType_422YpCbCr8,
+        [PixelFormats.YUYV] = LibCoreVideo.PixelFormatType_422YpCbCr8,
     };
 
     public static class Dlfcn
@@ -550,6 +549,12 @@ internal static class NativeMethods_AVFoundation
 
         [DllImport(Path)]
         public static extern double CMTimeGetSeconds(CMTime time);
+
+        [DllImport(Path)]
+        public static extern IntPtr CMBlockBufferGetDataPointer(IntPtr theBuffer, IntPtr offset, out IntPtr lengthAtOffsetOut, out IntPtr totalLengthOut, out IntPtr dataPointerOut);
+
+        [DllImport(Path)]
+        public static extern IntPtr CMSampleBufferGetDataBuffer(IntPtr sbuf);
 
         [DllImport(Path)]
         public static extern IntPtr CMSampleBufferGetImageBuffer(IntPtr sbuf);
