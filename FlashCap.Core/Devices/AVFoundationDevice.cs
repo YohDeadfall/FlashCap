@@ -7,6 +7,7 @@ using FlashCap.Internal;
 using static FlashCap.Internal.NativeMethods;
 using static FlashCap.Internal.NativeMethods_AVFoundation.LibAVFoundation;
 using static FlashCap.Internal.NativeMethods_AVFoundation.LibC;
+using static FlashCap.Internal.NativeMethods_AVFoundation.LibCoreFoundation;
 using static FlashCap.Internal.NativeMethods_AVFoundation.LibCoreMedia;
 using static FlashCap.Internal.NativeMethods_AVFoundation.LibCoreVideo;
 
@@ -108,12 +109,16 @@ public sealed class AVFoundationDevice : CaptureDevice
         this.device.ActiveVideoMaxFrameDuration = frameDuration;
         this.device.UnlockForConfiguration();
 
+        var globalQueue = GetGlobalQueue(DispatchQualityOfService.Background, flags: default);
+
+        CFRetain(globalQueue);
+
         this.deviceInput = new AVCaptureDeviceInput(this.device);
         this.deviceOutput = new AVCaptureVideoDataOutput();
         this.deviceOutput.SetPixelFormatType(pixelFormatType);
         this.deviceOutput.SetSampleBufferDelegate(
             new VideoBufferHandler(this),
-            GetGlobalQueue(DispatchQualityOfService.Background, flags: default));
+            globalQueue);
 
         this.session = new AVCaptureSession();
         this.session.AddInput(this.deviceInput);
