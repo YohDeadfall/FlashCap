@@ -186,6 +186,14 @@ public sealed class AVFoundationDevice : CaptureDevice
                             (long)(seconds * 1000),
                             this.frameIndex++);
                     }
+                    else
+                    {
+                        Console.WriteLine("Non continuous buffer");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No block buffer");
                 }
 
                 return;
