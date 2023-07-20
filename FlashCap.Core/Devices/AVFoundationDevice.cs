@@ -173,7 +173,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                     IntPtr lengthAtOffset;
                     IntPtr totalLength;
                     IntPtr dataPointer;
-                    CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, out lengthAtOffset, out totalLength, out dataPointer);
+                    IntPtr status = CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, out lengthAtOffset, out totalLength, out dataPointer);
 
                     if (lengthAtOffset == totalLength)
                     {
@@ -186,7 +186,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                     }
                     else
                     {
-                        Console.WriteLine($"Non continuous: {lengthAtOffset}, {totalLength}");
+                        Console.WriteLine($"Non continuous: {lengthAtOffset}, {totalLength}, {status}");
                         if (buffer?.Length != totalLength.ToInt32())
                             buffer = new byte[totalLength.ToInt32()];
 
