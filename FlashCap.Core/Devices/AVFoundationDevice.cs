@@ -161,9 +161,6 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
-            Console.WriteLine($"{nameof(DidOutputSampleBuffer)}:{captureOutput}:{sampleBuffer}:{connection}");
-            Console.WriteLine($"PixelBuffer: {CMSampleBufferGetImageBuffer(sampleBuffer)}");
-
             var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
             var seconds = CMTimeGetSeconds(timeStamp);
@@ -189,6 +186,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                     }
                     else
                     {
+                        Console.WriteLine($"Non continuous: {lengthAtOffset}, {totalLength}");
                         if (buffer?.Length != totalLength.ToInt32())
                             buffer = new byte[totalLength.ToInt32()];
 
