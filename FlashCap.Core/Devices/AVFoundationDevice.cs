@@ -148,6 +148,7 @@ public sealed class AVFoundationDevice : CaptureDevice
     {
         private readonly AVFoundationDevice device;
         private int frameIndex;
+        private byte[]? buffer;
 
         public VideoBufferHandler(AVFoundationDevice device)
         {
@@ -188,7 +189,24 @@ public sealed class AVFoundationDevice : CaptureDevice
                     }
                     else
                     {
-                        Console.WriteLine("Non continuous buffer");
+                        if (buffer?.Length != totalLength.ToInt32())
+                            buffer = new byte[totalLength.ToInt32()];
+
+                        unsafe
+                        {
+                            fixed (byte* bufferPtr = buffer)
+                            {
+                                if (IntPtr.Zero == CMBlockBufferAccessDataBytes(blockBuffer, IntPtr.Zero, totalLength, new IntPtr(bufferPtr), out var bufferData))
+                                {
+                                    this.device.frameProcessor?.OnFrameArrived(
+                                        this.device,
+                                        new IntPtr(bufferPtr),
+                                        totalLength.ToInt32(),
+                                        (long)(seconds * 1000),
+                                        this.frameIndex++);
+                                }
+                            }
+                        }
                     }
                 }
                 else

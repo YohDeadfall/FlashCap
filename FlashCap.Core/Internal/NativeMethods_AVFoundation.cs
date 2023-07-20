@@ -551,6 +551,9 @@ internal static class NativeMethods_AVFoundation
         public static extern double CMTimeGetSeconds(CMTime time);
 
         [DllImport(Path)]
+        public static extern IntPtr CMBlockBufferAccessDataBytes(IntPtr theBuffer, IntPtr offset, IntPtr length, IntPtr temporaryBlock, out IntPtr returnedPointerOut);
+
+        [DllImport(Path)]
         public static extern IntPtr CMBlockBufferGetDataPointer(IntPtr theBuffer, IntPtr offset, out IntPtr lengthAtOffsetOut, out IntPtr totalLengthOut, out IntPtr dataPointerOut);
 
         [DllImport(Path)]
