@@ -554,7 +554,7 @@ internal static class NativeMethods_AVFoundation
         public static extern IntPtr CMBlockBufferAccessDataBytes(IntPtr theBuffer, IntPtr offset, IntPtr length, IntPtr temporaryBlock, out IntPtr returnedPointerOut);
 
         [DllImport(Path)]
-        public static extern IntPtr CMBlockBufferGetDataPointer(IntPtr theBuffer, IntPtr offset, out IntPtr lengthAtOffsetOut, out IntPtr totalLengthOut, out IntPtr dataPointerOut);
+        public static unsafe extern IntPtr CMBlockBufferGetDataPointer(IntPtr theBuffer, IntPtr offset, IntPtr* lengthAtOffsetOut, IntPtr* totalLengthOut, IntPtr* dataPointerOut);
 
         [DllImport(Path)]
         public static extern IntPtr CMSampleBufferGetDataBuffer(IntPtr sbuf);
@@ -1135,26 +1135,22 @@ internal static class NativeMethods_AVFoundation
                     nameof(AVCaptureVideoDataOutputSampleBuffer),
                     extraBytes: IntPtr.Zero);
 
-                var dealloc = new DeallocDelegate(DeallocTrampoline);
-                var didDropSampleBuffer = new DidDropSampleBufferDelegate(DidDropSampleBufferTrampoline);
-                var didOutputSampleBuffer = new DidOutputSampleBufferDelegate(DidOutputSampleBufferTrampoline);
-
                 LibObjC.AddMethod(
                     handle,
                     LibObjC.GetSelector("dealloc"),
-                    Marshal.GetFunctionPointerForDelegate(dealloc),
+                    Marshal.GetFunctionPointerForDelegate(DeallocTrampoline),
                     types: "v@:");
 
                 LibObjC.AddMethod(
                     handle,
                     LibObjC.GetSelector("captureOutput:didDropSampleBuffer:fromConnection:"),
-                    Marshal.GetFunctionPointerForDelegate(didDropSampleBuffer),
+                    Marshal.GetFunctionPointerForDelegate(DidDropSampleBufferTrampoline),
                     types: "v@:@@@");
 
                 LibObjC.AddMethod(
                     handle,
                     LibObjC.GetSelector("captureOutput:didOutputSampleBuffer:fromConnection:"),
-                    Marshal.GetFunctionPointerForDelegate(didOutputSampleBuffer),
+                    Marshal.GetFunctionPointerForDelegate(DidOutputSampleBufferTrampoline),
                     types: "v@:@@@");
 
                 LibObjC.AddProtocol(
@@ -1195,32 +1191,33 @@ internal static class NativeMethods_AVFoundation
             public abstract void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection);
 
             private delegate void DidDropSampleBufferDelegate(IntPtr self, IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection);
-            private static void DidDropSampleBufferTrampoline(IntPtr self, IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
+            private delegate void DidOutputSampleBufferDelegate(IntPtr self, IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection);
+            private delegate void DeallocDelegate(IntPtr self);
+
+            private static DidDropSampleBufferDelegate DidDropSampleBufferTrampoline = (self, captureOutput, sampleBuffer, connection) =>
             {
                 var handle = LibObjC.GetVariable(self, HandleVariableDescriptor);
                 var obj = GCHandle.FromIntPtr(handle).Target as AVCaptureVideoDataOutputSampleBuffer;
 
                 obj?.DidDropSampleBuffer(captureOutput, sampleBuffer, connection);
-            }
+            };
 
-            private delegate void DidOutputSampleBufferDelegate(IntPtr self, IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection);
-            private static void DidOutputSampleBufferTrampoline(IntPtr self, IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
+            private static DidOutputSampleBufferDelegate DidOutputSampleBufferTrampoline = (self, captureOutput, sampleBuffer, connection) =>
             {
                 var handle = LibObjC.GetVariable(self, HandleVariableDescriptor);
                 var obj = GCHandle.FromIntPtr(handle).Target as AVCaptureVideoDataOutputSampleBuffer;
 
                 obj?.DidOutputSampleBuffer(captureOutput, sampleBuffer, connection);
-            }
+            };
 
-            private delegate void DeallocDelegate(IntPtr self);
-            private static void DeallocTrampoline(IntPtr self)
+            private static DeallocDelegate DeallocTrampoline = (self) =>
             {
                 var handle = LibObjC.GetVariable(self, HandleVariableDescriptor);
 
                 GCHandle
                     .FromIntPtr(handle)
                     .Free();
-            }
+            };
         }
 
         public sealed class AVCaptureSession : LibObjC.NSObject

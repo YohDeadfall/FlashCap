@@ -159,7 +159,7 @@ public sealed class AVFoundationDevice : CaptureDevice
         {
         }
 
-        public override void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
+        public override unsafe void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
             var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
@@ -173,7 +173,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                     IntPtr lengthAtOffset;
                     IntPtr totalLength;
                     IntPtr dataPointer;
-                    IntPtr status = CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, out lengthAtOffset, out totalLength, out dataPointer);
+                    IntPtr status = CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, &lengthAtOffset, &totalLength, &dataPointer);
 
                     if (lengthAtOffset == totalLength)
                     {
