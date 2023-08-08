@@ -161,79 +161,38 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override unsafe void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
-            var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-            var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
-            var seconds = CMTimeGetSeconds(timeStamp);
-
-            if (pixelBuffer == IntPtr.Zero)
-            {
-                var blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
-                if (blockBuffer != IntPtr.Zero)
-                {
-                    IntPtr lengthAtOffset;
-                    IntPtr totalLength;
-                    IntPtr dataPointer;
-                    IntPtr status = CMBlockBufferGetDataPointer(blockBuffer, IntPtr.Zero, &lengthAtOffset, &totalLength, &dataPointer);
-
-                    if (lengthAtOffset == totalLength)
-                    {
-                        this.device.frameProcessor?.OnFrameArrived(
-                            this.device,
-                            dataPointer,
-                            (int)totalLength,
-                            (long)(seconds * 1000),
-                            this.frameIndex++);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Non continuous: {lengthAtOffset}, {totalLength}, {status}");
-                        if (buffer?.Length != totalLength.ToInt32())
-                            buffer = new byte[totalLength.ToInt32()];
-
-                        unsafe
-                        {
-                            fixed (byte* bufferPtr = buffer)
-                            {
-                                if (IntPtr.Zero == CMBlockBufferAccessDataBytes(blockBuffer, IntPtr.Zero, totalLength, new IntPtr(bufferPtr), out var bufferData))
-                                {
-                                    this.device.frameProcessor?.OnFrameArrived(
-                                        this.device,
-                                        new IntPtr(bufferPtr),
-                                        totalLength.ToInt32(),
-                                        (long)(seconds * 1000),
-                                        this.frameIndex++);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No block buffer");
-                }
-
-                return;
-            }
-
-            CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
-
             try
             {
-                Console.WriteLine($"Base Address: {CVPixelBufferGetBaseAddress(pixelBuffer)}");
-                Console.WriteLine($"Planes: {CVPixelBufferGetPlaneCount(pixelBuffer)}");
+                var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+                if (pixelBuffer == IntPtr.Zero)
+                {
+                    return;
+                }
 
-                var format = CVPixelBufferGetPixelFormatType(pixelBuffer);
-                Console.WriteLine($"Format: {GetFourCCName(format)} ({format:x})");
-                this.device.frameProcessor?.OnFrameArrived(
-                    this.device,
-                    CVPixelBufferGetBaseAddress(pixelBuffer),
-                    (int)CVPixelBufferGetDataSize(pixelBuffer),
-                    (long)(seconds * 1000),
-                    this.frameIndex++);
+                var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
+                var seconds = CMTimeGetSeconds(timeStamp);
+
+    
+                CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
+
+                try
+                {
+                    this.device.frameProcessor?.OnFrameArrived(
+                        this.device,
+                        CVPixelBufferGetBaseAddress(pixelBuffer),
+                        (int)CVPixelBufferGetDataSize(pixelBuffer),
+                        (long)(seconds * 1000),
+                        this.frameIndex++);
+                }
+                finally
+                {
+                    CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
+                }
             }
             finally
             {
-                CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
+                // Required to return the buffer to the queue of free buffers.
+                CFRelease(sampleBuffer);
             }
         }
     }
