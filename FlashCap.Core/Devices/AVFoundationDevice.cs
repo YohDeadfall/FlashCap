@@ -17,6 +17,7 @@ public sealed class AVFoundationDevice : CaptureDevice
 {
     private readonly string uniqueID;
 
+    private DispatchQueue? queue;
     private AVCaptureDevice? device;
     private AVCaptureDeviceInput? deviceInput;
     private AVCaptureVideoDataOutput? deviceOutput;
@@ -37,6 +38,7 @@ public sealed class AVFoundationDevice : CaptureDevice
         this.deviceInput?.Dispose();
         this.deviceOutput?.Dispose();
         this.session?.Dispose();
+        this.device?.Dispose();
 
         Marshal.FreeHGlobal(this.bitmapHeader);
 
@@ -84,6 +86,7 @@ public sealed class AVFoundationDevice : CaptureDevice
             throw;
         }
 
+        this.queue = new DispatchQueue(nameof(FlashCap));
         this.device = AVCaptureDevice.DeviceWithUniqueID(uniqueID);
 
         if (this.device is null)
@@ -109,16 +112,12 @@ public sealed class AVFoundationDevice : CaptureDevice
         this.device.ActiveVideoMaxFrameDuration = frameDuration;
         this.device.UnlockForConfiguration();
 
-        var globalQueue = GetGlobalQueue(DispatchQualityOfService.Background, flags: default);
-
-        CFRetain(globalQueue);
-
         this.deviceInput = new AVCaptureDeviceInput(this.device);
         this.deviceOutput = new AVCaptureVideoDataOutput();
         this.deviceOutput.SetPixelFormatType(pixelFormatType);
         this.deviceOutput.SetSampleBufferDelegate(
             new VideoBufferHandler(this),
-            globalQueue);
+            this.queue);
 
         this.session = new AVCaptureSession();
         this.session.AddInput(this.deviceInput);
@@ -148,7 +147,6 @@ public sealed class AVFoundationDevice : CaptureDevice
     {
         private readonly AVFoundationDevice device;
         private int frameIndex;
-        private byte[]? buffer;
 
         public VideoBufferHandler(AVFoundationDevice device)
         {
@@ -172,7 +170,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                 var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
                 var seconds = CMTimeGetSeconds(timeStamp);
 
-    
+
                 CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
 
                 try
