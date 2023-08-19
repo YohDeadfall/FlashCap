@@ -159,6 +159,7 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override unsafe void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
+            Console.WriteLine($"{nameof(DidDropSampleBuffer)}:162");
             try
             {
                 var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -167,11 +168,24 @@ public sealed class AVFoundationDevice : CaptureDevice
                     return;
                 }
 
+                Console.WriteLine($"{nameof(DidDropSampleBuffer)}:171");
+
                 var timeStamp = CMSampleBufferGetDecodeTimeStamp(sampleBuffer);
                 var seconds = CMTimeGetSeconds(timeStamp);
+                
+                Console.WriteLine($"{nameof(DidDropSampleBuffer)}:176");
 
+                CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.ReadOnly);
 
-                CVPixelBufferLockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
+                Console.WriteLine($"{nameof(DidDropSampleBuffer)}:180");
+
+                var baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer);
+                if (pixelBuffer == IntPtr.Zero)
+                {
+                    return;
+                }
+
+                Console.WriteLine($"{nameof(DidDropSampleBuffer)}:188");
 
                 try
                 {
@@ -184,7 +198,7 @@ public sealed class AVFoundationDevice : CaptureDevice
                 }
                 finally
                 {
-                    CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.None);
+                    CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.ReadOnly);
                 }
             }
             finally
