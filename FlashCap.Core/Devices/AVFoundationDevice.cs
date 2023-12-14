@@ -153,9 +153,13 @@ public sealed class AVFoundationDevice : CaptureDevice
 
         public override void DidOutputSampleBuffer(IntPtr captureOutput, IntPtr sampleBuffer, IntPtr connection)
         {
+            CFRetain(sampleBuffer);
+
             var pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             if (pixelBuffer == IntPtr.Zero)
             {
+                CFRelease(sampleBuffer);
+
                 return;
             }
 
@@ -176,7 +180,6 @@ public sealed class AVFoundationDevice : CaptureDevice
             finally
             {
                 CVPixelBufferUnlockBaseAddress(pixelBuffer, PixelBufferLockFlags.ReadOnly);
-                // Required to return the buffer to the queue of free buffers.
                 CFRelease(sampleBuffer);
             }
         }
