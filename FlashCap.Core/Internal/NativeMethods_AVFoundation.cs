@@ -113,40 +113,40 @@ internal static class NativeMethods_AVFoundation
         public const string ReleaseSelector = "release";
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern void SendNoResult(IntPtr receiver, IntPtr selector, bool arg1);
+        public static extern void SendRetVoid(IntPtr receiver, IntPtr selector, bool arg1);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern void SendNoResult(IntPtr receiver, IntPtr selector);
+        public static extern void SendRetVoid(IntPtr receiver, IntPtr selector);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern void SendNoResult(IntPtr receiver, IntPtr selector, IntPtr arg1);
+        public static extern void SendRetVoid(IntPtr receiver, IntPtr selector, IntPtr arg1);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern void SendNoResult(IntPtr receiver, IntPtr selector, LibCoreMedia.CMTime arg1);
+        public static extern void SendRetVoid(IntPtr receiver, IntPtr selector, LibCoreMedia.CMTime arg1);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public extern static void SendNoResult(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+        public extern static void SendRetVoid(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern bool SendAndGetBool(IntPtr receiver, IntPtr selector);
+        public static extern bool SendRetBool(IntPtr receiver, IntPtr selector);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern IntPtr SendAndGetHandle(IntPtr receiver, IntPtr selector);
+        public static extern IntPtr SendRetIntPtr(IntPtr receiver, IntPtr selector);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern IntPtr SendAndGetHandle(IntPtr receiver, IntPtr selector, IntPtr arg1);
+        public static extern IntPtr SendRetIntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern IntPtr SendAndGetHandle(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+        public static extern IntPtr SendRetIntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern IntPtr SendAndGetHandle(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2, long arg3);
+        public static extern IntPtr SendRetIntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2, long arg3);
 
         [DllImport(Path, EntryPoint = "objc_msgSend")]
-        public static extern LibCoreMedia.CMTime SendAndGetCMTime(IntPtr receiver, IntPtr selector);
+        public static extern LibCoreMedia.CMTime SendRetCMTime(IntPtr receiver, IntPtr selector);
 
         [DllImport(Path, EntryPoint = "objc_msgSend_stret")]
-        public static extern void SendAndGetCMTimeStret(out LibCoreMedia.CMTime result, IntPtr receiver, IntPtr selector);
+        public static extern void SendRetCMTimeStret(out LibCoreMedia.CMTime result, IntPtr receiver, IntPtr selector);
 
         [DllImport(Path, EntryPoint = "objc_getClass")]
         public static extern IntPtr GetClass(string name);
@@ -353,7 +353,7 @@ internal static class NativeMethods_AVFoundation
                 if (Handle == IntPtr.Zero)
                     return;
 
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector(LibObjC.ReleaseSelector));
 
@@ -730,10 +730,10 @@ internal static class NativeMethods_AVFoundation
                 {
                     if (LibSystem.IsOnArm64)
                     {
-                        return LibObjC.SendAndGetCMTime(Handle, LibObjC.GetSelector("maxFrameDuration"));
+                        return LibObjC.SendRetCMTime(Handle, LibObjC.GetSelector("maxFrameDuration"));
                     }
 
-                    LibObjC.SendAndGetCMTimeStret(out var result, Handle, LibObjC.GetSelector("maxFrameDuration"));
+                    LibObjC.SendRetCMTimeStret(out var result, Handle, LibObjC.GetSelector("maxFrameDuration"));
 
                     return result;
                 }
@@ -746,12 +746,12 @@ internal static class NativeMethods_AVFoundation
                     if (LibSystem.IsOnArm64)
                     {
 
-                        return LibObjC.SendAndGetCMTime(Handle, LibObjC.GetSelector("minFrameDuration"));
+                        return LibObjC.SendRetCMTime(Handle, LibObjC.GetSelector("minFrameDuration"));
 
                     }
 
 
-                    LibObjC.SendAndGetCMTimeStret(out var result, Handle, LibObjC.GetSelector("minFrameDuration"));
+                    LibObjC.SendRetCMTimeStret(out var result, Handle, LibObjC.GetSelector("minFrameDuration"));
 
                     return result;
                 }
@@ -770,7 +770,7 @@ internal static class NativeMethods_AVFoundation
                 get
                 {
                     using var result = new LibCoreFoundation.CFString(
-                        LibObjC.SendAndGetHandle(
+                        LibObjC.SendRetIntPtr(
                             Handle,
                             LibObjC.GetSelector("uniqueID")));
 
@@ -783,7 +783,7 @@ internal static class NativeMethods_AVFoundation
                 get
                 {
                     using var result = new LibCoreFoundation.CFString(
-                        LibObjC.SendAndGetHandle(
+                        LibObjC.SendRetIntPtr(
                             Handle,
                             LibObjC.GetSelector("modelID")));
 
@@ -796,7 +796,7 @@ internal static class NativeMethods_AVFoundation
                 get
                 {
                     using var result = new LibCoreFoundation.CFString(
-                        LibObjC.SendAndGetHandle(
+                        LibObjC.SendRetIntPtr(
                             Handle,
                             LibObjC.GetSelector("localizedName")));
 
@@ -809,7 +809,7 @@ internal static class NativeMethods_AVFoundation
             {
                 get
                 {
-                    var handle = LibObjC.SendAndGetHandle(
+                    var handle = LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("formats"));
 
@@ -820,12 +820,12 @@ internal static class NativeMethods_AVFoundation
             public AVCaptureDeviceFormat ActiveFormat
             {
                 get => new AVCaptureDeviceFormat(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("activeFormat")),
                     retain: true);
                 set =>
-                    LibObjC.SendNoResult(
+                    LibObjC.SendRetVoid(
                         Handle,
                         LibObjC.GetSelector("setActiveFormat:"),
                         value.Handle);
@@ -837,16 +837,16 @@ internal static class NativeMethods_AVFoundation
                 {
                     if (LibSystem.IsOnArm64)
                     {
-                        LibObjC.SendAndGetCMTimeStret(out var result, Handle, LibObjC.GetSelector("activeVideoMinFrameDuration"));
+                        LibObjC.SendRetCMTimeStret(out var result, Handle, LibObjC.GetSelector("activeVideoMinFrameDuration"));
 
                         return result;
                     }
 
-                    return LibObjC.SendAndGetCMTime(Handle, LibObjC.GetSelector("activeVideoMinFrameDuration"));
+                    return LibObjC.SendRetCMTime(Handle, LibObjC.GetSelector("activeVideoMinFrameDuration"));
                 }
                 set
                 {
-                    LibObjC.SendNoResult(
+                    LibObjC.SendRetVoid(
                         Handle,
                         LibObjC.GetSelector("setActiveVideoMinFrameDuration:"),
                         value);
@@ -859,16 +859,16 @@ internal static class NativeMethods_AVFoundation
                 {
                     if (LibSystem.IsOnArm64)
                     {
-                        LibObjC.SendAndGetCMTimeStret(out var result, Handle, LibObjC.GetSelector("activeVideoMaxFrameDuration"));
+                        LibObjC.SendRetCMTimeStret(out var result, Handle, LibObjC.GetSelector("activeVideoMaxFrameDuration"));
 
                         return result;
                     }
 
-                    return LibObjC.SendAndGetCMTime(Handle, LibObjC.GetSelector("activeVideoMaxFrameDuration"));
+                    return LibObjC.SendRetCMTime(Handle, LibObjC.GetSelector("activeVideoMaxFrameDuration"));
                 }
                 set
                 {
-                    LibObjC.SendNoResult(
+                    LibObjC.SendRetVoid(
                         Handle,
                         LibObjC.GetSelector("setActiveVideoMaxFrameDuration:"),
                         value);
@@ -878,7 +878,7 @@ internal static class NativeMethods_AVFoundation
             public unsafe void LockForConfiguration()
             {
                 IntPtr errorHandle;
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("lockForConfiguration:"),
                     new IntPtr(&errorHandle));
@@ -892,7 +892,7 @@ internal static class NativeMethods_AVFoundation
 
             public unsafe void UnlockForConfiguration()
             {
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("unlockForConfiguration"));
             }
@@ -900,7 +900,7 @@ internal static class NativeMethods_AVFoundation
             public static AVCaptureDevice? DeviceWithUniqueID(string deviceUniqueID)
             {
                 using var nativeDeviceUniqueID = LibCoreFoundation.CFString.Create(deviceUniqueID);
-                var handle = LibObjC.SendAndGetHandle(
+                var handle = LibObjC.SendRetIntPtr(
                     LibObjC.GetClass(nameof(AVCaptureDevice)),
                     LibObjC.GetSelector("deviceWithUniqueID:"),
                     nativeDeviceUniqueID.Handle);
@@ -911,7 +911,7 @@ internal static class NativeMethods_AVFoundation
             public static AVAuthorizationStatus GetAuthorizationStatus(IntPtr mediaType)
             {
                 return (AVAuthorizationStatus)(long)
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         LibObjC.GetClass(nameof(AVCaptureDevice)),
                         LibObjC.GetSelector("authorizationStatusForMediaType:"),
                         mediaType);
@@ -933,7 +933,7 @@ internal static class NativeMethods_AVFoundation
 
                 using var blockLiteral = RequestAccessForMediaTypeBlockFactory.CreateLiteral(completion);
 
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     LibObjC.GetClass(nameof(AVCaptureDevice)),
                     LibObjC.GetSelector("requestAccessForMediaType:completionHandler:"),
                     mediaType,
@@ -949,7 +949,7 @@ internal static class NativeMethods_AVFoundation
 
             public AVCaptureDevice[] Devices =>
                 LibCoreFoundation.CFArray.ToArray(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("devices")),
                     static handle => new AVCaptureDevice(handle, retain: true));
@@ -973,7 +973,7 @@ internal static class NativeMethods_AVFoundation
                 var position = (long)AVCaptureDevicePosition.Unspecified;
 
                 return new AVCaptureDeviceDiscoverySession(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         LibObjC.GetClass(nameof(AVCaptureDeviceDiscoverySession)),
                         LibObjC.GetSelector("discoverySessionWithDeviceTypes:mediaType:position:"),
                         deviceTypesArray.Handle,
@@ -991,13 +991,13 @@ internal static class NativeMethods_AVFoundation
 
             public LibCoreMedia.CMFormatDescription FormatDescription =>
                 new LibCoreMedia.CMFormatDescription(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("formatDescription")));
 
             public AVFrameRateRange[] VideoSupportedFrameRateRanges =>
                 LibCoreFoundation.CFArray.ToArray(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("videoSupportedFrameRateRanges")),
                     static handle => new AVFrameRateRange(handle, retain: true));
@@ -1042,7 +1042,7 @@ internal static class NativeMethods_AVFoundation
             private static unsafe IntPtr FromDevice(AVCaptureDevice device)
             {
                 var errorHandle = default(IntPtr);
-                var inputHandle = LibObjC.SendAndGetHandle(
+                var inputHandle = LibObjC.SendRetIntPtr(
                     LibObjC.GetClass(nameof(AVCaptureDeviceInput)),
                     LibObjC.GetSelector("deviceInputWithDevice:error:"),
                     device.Handle,
@@ -1061,19 +1061,19 @@ internal static class NativeMethods_AVFoundation
         public sealed class AVCaptureVideoDataOutput : AVCaptureOutput
         {
             public AVCaptureVideoDataOutput() : base(
-                LibObjC.SendAndGetHandle(
+                LibObjC.SendRetIntPtr(
                     LibObjC.GetClass(nameof(AVCaptureVideoDataOutput)),
                     LibObjC.GetSelector(LibObjC.AllocSelector)),
                 retain: false)
             {
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("init"));
             }
 
             public unsafe int[] AvailableVideoCVPixelFormatTypes =>
                 LibCoreFoundation.CFArray.ToArray(
-                    LibObjC.SendAndGetHandle(
+                    LibObjC.SendRetIntPtr(
                         Handle,
                         LibObjC.GetSelector("availableVideoCVPixelFormatTypes")),
                     static handle =>
@@ -1087,11 +1087,11 @@ internal static class NativeMethods_AVFoundation
             public bool AlwaysDiscardsLateVideoFrames
             {
                 get =>
-                    LibObjC.SendAndGetBool(
+                    LibObjC.SendRetBool(
                         Handle,
                         LibObjC.GetSelector("alwaysDiscardsLateVideoFrames"));
                 set =>
-                    LibObjC.SendNoResult(
+                    LibObjC.SendRetVoid(
                         Handle,
                         LibObjC.GetSelector("setAlwaysDiscardsLateVideoFrames:"),
                         value);
@@ -1111,7 +1111,7 @@ internal static class NativeMethods_AVFoundation
                     LibCoreFoundation.kCFCopyStringDictionaryKeyCallBacks,
                     LibCoreFoundation.kCFTypeDictionaryValueCallBacks);
 
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("setVideoSettings:"),
                     dictionary);
@@ -1121,7 +1121,7 @@ internal static class NativeMethods_AVFoundation
             }
 
             public void SetSampleBufferDelegate(AVCaptureVideoDataOutputSampleBuffer sampleBufferDelegate, LibCoreFoundation.DispatchQueue sampleBufferCallbackQueue) =>
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("setSampleBufferDelegate:queue:"),
                     sampleBufferDelegate.Handle,
@@ -1180,7 +1180,7 @@ internal static class NativeMethods_AVFoundation
             }
 
             protected AVCaptureVideoDataOutputSampleBuffer() : base(
-                LibObjC.SendAndGetHandle(
+                LibObjC.SendRetIntPtr(
                     LibObjC.GetClass(nameof(AVCaptureVideoDataOutputSampleBuffer)),
                     LibObjC.GetSelector(LibObjC.AllocSelector)),
                 retain: false)
@@ -1228,35 +1228,35 @@ internal static class NativeMethods_AVFoundation
         public sealed class AVCaptureSession : LibObjC.NSObject
         {
             public AVCaptureSession() : base(
-                LibObjC.SendAndGetHandle(
+                LibObjC.SendRetIntPtr(
                     LibObjC.GetClass(nameof(AVCaptureSession)),
                     LibObjC.GetSelector(LibObjC.AllocSelector)),
                 retain: false)
             {
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("init"));
             }
 
             public void AddInput(AVCaptureInput input) =>
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("addInput:"),
                     input.Handle);
 
             public void AddOutput(AVCaptureOutput output) =>
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("addOutput:"),
                     output.Handle);
 
             public void StartRunning() =>
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("startRunning"));
 
             public void StopRunning() =>
-                LibObjC.SendNoResult(
+                LibObjC.SendRetVoid(
                     Handle,
                     LibObjC.GetSelector("stopRunning"));
         }
