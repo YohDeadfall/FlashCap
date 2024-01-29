@@ -650,9 +650,6 @@ internal static class NativeMethods_AVFoundation
         public static extern nuint CVPixelBufferGetDataSize(IntPtr pixelBuffer);
 
         [DllImport(Path)]
-        public static extern nuint CVPixelBufferGetPlaneCount(IntPtr pixelBuffer);
-
-        [DllImport(Path)]
         public static extern IntPtr CVPixelBufferGetBaseAddress(IntPtr pixelBuffer);
 
         [DllImport(Path)]
